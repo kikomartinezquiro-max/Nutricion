@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluación Nutricional &amp; Bienestar · Kiko Martínez</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>
+<style>
+:root{
+  --crema:#F6F1E9;--crema2:#EEE7D8;--blanco:#FDFAF4;
+  --tierra:#7A5B3D;--td:#533C24;--tm:#9A7455;--tl:#C4A882;
+  --verde:#546F57;--vl:#849D87;--vp:#D3E2D4;
+  --oro:#B5924A;--azul:#5C7A8A;
+  --txt:#2A1C0E;--txtm:#644D35;--txts:#9B8570;
+  --borde:#D6CABC;--bordel:#EAE2D6;--sombra:rgba(83,60,36,.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--crema);font-family:'Jost',sans-serif;font-weight:300;color:var(--txt);min-height:100vh;padding-bottom:120px}
+
+/* PORTADA */
+.portada{background:var(--td);position:relative;overflow:hidden;padding:80px 48px 68px;text-align:center}
+.portada::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 55% at 8% 15%,rgba(181,146,74,.20) 0%,transparent 65%),radial-gradient(ellipse 45% 55% at 92% 85%,rgba(84,111,87,.22) 0%,transparent 65%);pointer-events:none}
+.port-orn{display:flex;align-items:center;justify-content:center;margin-bottom:28px}
+.port-orn::before,.port-orn::after{content:'';flex:1;max-width:96px;height:1px}
+.port-orn::before{background:linear-gradient(to right,transparent,rgba(181,146,74,.45))}
+.port-orn::after{background:linear-gradient(to left,transparent,rgba(181,146,74,.45))}
+.port-rombo{width:6px;height:6px;background:var(--oro);transform:rotate(45deg);margin:0 14px;flex-shrink:0}
+.port-eye{font-size:9px;font-weight:600;letter-spacing:5px;text-transform:uppercase;color:var(--oro);display:block;margin-bottom:16px}
+.portada h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,5.5vw,3.8rem);font-weight:300;line-height:1.1;color:var(--blanco);margin-bottom:6px}
+.portada h1 em{font-style:italic;font-weight:400;color:var(--oro)}
+.port-sub{margin:20px auto 0;max-width:500px;font-size:13.5px;font-weight:300;color:rgba(253,250,244,.55);line-height:1.85}
+.port-firma{margin-top:28px;font-size:9px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:rgba(253,250,244,.28)}
+
+/* BARRA */
+.barra{position:sticky;top:0;z-index:200;background:var(--blanco);border-bottom:1px solid var(--bordel);padding:13px 40px;display:flex;align-items:center;gap:18px;box-shadow:0 2px 18px var(--sombra)}
+.barra-lbl{font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--txts);white-space:nowrap}
+.barra-pista{flex:1;height:2px;background:var(--borde);border-radius:2px;overflow:hidden}
+.barra-fill{height:100%;background:linear-gradient(90deg,var(--verde),var(--oro));width:0%;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.barra-num{font-size:11px;font-weight:500;color:var(--verde);white-space:nowrap;min-width:32px;text-align:right}
+
+/* WRAP */
+.wrap{max-width:860px;margin:0 auto;padding:48px 24px}
+
+/* SECCIÓN */
+.sec{background:var(--blanco);border:1px solid var(--bordel);border-radius:2px;margin-bottom:28px;overflow:hidden;box-shadow:0 2px 22px var(--sombra);transition:box-shadow .3s}
+.sec:hover{box-shadow:0 6px 36px rgba(83,60,36,.13)}
+.sec-cab{display:grid;grid-template-columns:3px 1fr;gap:0 24px;padding:28px 36px;border-bottom:1px solid var(--bordel);background:var(--crema);align-items:start}
+.sec-acento{grid-row:1/3;border-radius:2px;align-self:stretch}
+.sec-num{font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--txts);margin-bottom:4px}
+.sec-cab h2{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:500;color:var(--txt);line-height:1.1}
+.sec-cab p{grid-column:2;font-size:12px;font-weight:300;color:var(--txts);margin-top:4px}
+.sec-body{padding:36px}
+
+/* PREGUNTA */
+.pq{margin-bottom:28px}
+.pq:last-child{margin-bottom:0}
+label.ql{display:block;font-size:13px;font-weight:500;color:var(--td);margin-bottom:11px;line-height:1.55}
+label.ql .req{color:var(--oro);margin-left:2px}
+label.ql .hint{display:block;font-size:11.5px;font-weight:300;color:var(--txts);margin-top:3px}
+
+/* INPUTS */
+input[type=text],input[type=number],input[type=email],input[type=tel],select,textarea{width:100%;background:var(--crema);border:1px solid var(--borde);border-radius:2px;padding:12px 15px;font-family:'Jost',sans-serif;font-size:13px;font-weight:300;color:var(--txt);outline:none;appearance:none;transition:border-color .2s,box-shadow .2s,background .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--verde);background:var(--blanco);box-shadow:0 0 0 3px rgba(84,111,87,.10)}
+textarea{resize:vertical;min-height:84px;line-height:1.65}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%239B8570' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px;cursor:pointer}
+
+/* OPCIONES */
+.ops{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:7px}
+.ops.c1{grid-template-columns:1fr}
+.ops.c2{grid-template-columns:1fr 1fr}
+.op{position:relative}
+.op input[type=radio],.op input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
+.op label{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;background:var(--crema);border:1px solid var(--borde);border-radius:2px;cursor:pointer;font-size:12.5px;font-weight:300;color:var(--txtm);line-height:1.45;transition:all .15s;user-select:none}
+.op label::before{content:'';width:14px;height:14px;min-width:14px;border:1.5px solid var(--borde);border-radius:50%;background:var(--blanco);margin-top:1px;transition:all .15s;flex-shrink:0}
+.op input[type=checkbox]+label::before{border-radius:2px}
+.op input:checked+label{border-color:var(--verde);background:rgba(84,111,87,.07);color:var(--td);font-weight:400}
+.op input:checked+label::before{background:var(--verde);border-color:var(--verde);box-shadow:inset 0 0 0 3px var(--blanco)}
+.op input[type=checkbox]:checked+label::before{background:var(--verde) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9' viewBox='0 0 24 24' fill='none' stroke='%23FDFAF4' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E") center/64% no-repeat;box-shadow:none}
+
+/* ESCALA */
+.esc{padding:2px 0}
+.esc-labs{display:flex;justify-content:space-between;font-size:10.5px;font-weight:400;color:var(--txts);margin-bottom:9px}
+.esc-nums{display:flex;gap:6px}
+.esc-n{flex:1;text-align:center}
+.esc-n input{display:none}
+.esc-n label{display:flex;align-items:center;justify-content:center;height:36px;background:var(--crema);border:1px solid var(--borde);border-radius:2px;font-size:12.5px;font-weight:500;color:var(--txts);cursor:pointer;transition:all .15s}
+.esc-n input:checked+label{background:var(--verde);border-color:var(--verde);color:var(--blanco)}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* SEPARADOR */
+.sep{height:1px;background:var(--bordel);margin:26px 0}
+
+/* TABLA FRECUENCIA */
+.tbl{width:100%;border-collapse:separate;border-spacing:0 5px}
+.tbl thead th{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--txts);padding:2px 5px 8px;text-align:center}
+.tbl thead th:first-child{text-align:left;padding-left:0}
+.tbl tbody td:first-child{font-size:12.5px;font-weight:300;color:var(--txtm);padding:7px 14px 7px 0;line-height:1.4}
+.tbl tbody td{text-align:center;padding:5px 3px}
+.fb{position:relative}
+.fb input{display:none}
+.fb label{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:var(--crema);border:1px solid var(--borde);border-radius:50%;font-size:8.5px;font-weight:600;color:var(--txts);cursor:pointer;transition:all .15s}
+.fb input:checked+label{background:var(--verde);border-color:var(--verde);color:var(--blanco)}
+
+/* RGPD */
+.rgpd-fila{display:grid;grid-template-columns:110px 1fr;gap:0 32px;padding:22px 0;border-bottom:1px solid var(--bordel);align-items:start}
+.rgpd-fila:first-child{padding-top:0}
+.rgpd-fila:last-child{border-bottom:none;padding-bottom:0}
+.rgpd-key{font-size:8.5px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--oro);padding-top:3px;line-height:1.5}
+.rgpd-val{font-size:13px;font-weight:300;color:var(--txtm);line-height:1.9}
+.rgpd-wrap{margin-bottom:32px}
+.rgpd-nota{background:rgba(84,111,87,.06);border:1px solid rgba(84,111,87,.18);border-left:3px solid var(--verde);border-radius:2px;padding:16px 20px;font-size:12.5px;font-weight:300;color:var(--txtm);line-height:1.75;margin-bottom:28px}
+.c-bloque{display:flex;flex-direction:column;gap:10px}
+.c-item{display:flex;align-items:flex-start;gap:16px;padding:18px 20px;background:var(--crema);border:1px solid var(--borde);border-radius:2px;transition:border-color .2s}
+.c-item:hover{border-color:var(--vl)}
+.c-item input[type=checkbox]{width:17px;height:17px;min-width:17px;border:1.5px solid var(--borde);border-radius:2px;appearance:none;cursor:pointer;margin-top:2px;flex-shrink:0;position:relative;background:var(--blanco);transition:all .15s}
+.c-item input[type=checkbox]:checked{background:var(--verde);border-color:var(--verde)}
+.c-item input[type=checkbox]:checked::after{content:'';position:absolute;top:2px;left:5px;width:5px;height:9px;border:1.5px solid white;border-top:none;border-left:none;transform:rotate(45deg)}
+.c-txt{font-size:13px;font-weight:300;color:var(--txtm);line-height:1.75}
+.c-txt strong{font-weight:500;color:var(--txt)}
+.c-req{color:var(--oro);margin-left:2px}
+.c-opt{font-size:10.5px;font-weight:400;color:var(--txts);margin-left:6px;font-style:italic}
+
+/* ENVÍO */
+.envio{background:var(--td);border-radius:2px;padding:60px 40px;text-align:center;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(83,60,36,.22)}
+.envio::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 70% at 85% 15%,rgba(181,146,74,.15) 0%,transparent 60%),radial-gradient(ellipse 40% 55% at 15% 85%,rgba(84,111,87,.15) 0%,transparent 60%);pointer-events:none}
+.envio-orn{display:flex;align-items:center;justify-content:center;margin-bottom:22px;position:relative}
+.envio-orn::before,.envio-orn::after{content:'';width:56px;height:1px;background:rgba(181,146,74,.3)}
+.envio-rombo{width:5px;height:5px;background:var(--oro);transform:rotate(45deg);margin:0 12px;flex-shrink:0}
+.envio h3{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;color:var(--blanco);margin-bottom:10px;position:relative}
+.envio p{font-size:13px;font-weight:300;color:rgba(253,250,244,.50);max-width:400px;margin:0 auto 30px;line-height:1.85;position:relative}
+.btn-wrap{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;position:relative}
+.btn-pdf{display:inline-flex;align-items:center;gap:10px;padding:14px 34px;background:var(--oro);color:var(--td);border:none;border-radius:2px;font-family:'Jost',sans-serif;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .22s;box-shadow:0 4px 16px rgba(181,146,74,.3)}
+.btn-pdf:hover{background:#c9a850;transform:translateY(-2px);box-shadow:0 8px 28px rgba(181,146,74,.38)}
+.btn-rst{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;background:transparent;color:rgba(253,250,244,.38);border:1px solid rgba(253,250,244,.14);border-radius:2px;font-family:'Jost',sans-serif;font-size:11.5px;font-weight:300;cursor:pointer;transition:all .22s}
+.btn-rst:hover{border-color:rgba(253,250,244,.40);color:rgba(253,250,244,.7)}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--td);color:var(--blanco);padding:12px 26px;border-radius:2px;font-size:12.5px;font-weight:400;z-index:999;transition:transform .4s cubic-bezier(.34,1.56,.64,1);border-left:3px solid var(--oro);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* MODAL */
+.mbg{display:none;position:fixed;inset:0;background:rgba(42,28,14,.55);z-index:300;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(3px)}
+.mbg.on{display:flex}
+.modal{background:var(--blanco);border-radius:2px;padding:52px 48px;max-width:440px;width:100%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.22);animation:mA .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes mA{from{transform:scale(.86);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-ic{width:50px;height:50px;border-radius:50%;background:var(--vp);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.modal-ic svg{width:22px;height:22px;stroke:var(--verde);stroke-width:2.5;fill:none}
+.modal h3{font-family:'Cormorant Garamond',serif;font-size:1.65rem;font-weight:500;color:var(--txt);margin-bottom:10px}
+.modal p{font-size:13px;font-weight:300;color:var(--txts);line-height:1.75;margin-bottom:24px}
+
+/* FOOTER */
+.footer{text-align:center;padding:22px;font-size:10.5px;font-weight:300;color:var(--txts);letter-spacing:.5px}
+.footer span{display:inline-block;width:4px;height:4px;background:var(--oro);transform:rotate(45deg);vertical-align:middle;margin:0 8px;opacity:.45}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .portada{padding:52px 22px 48px}
+  .sec-cab{padding:20px 22px}.sec-body{padding:26px 22px}
+  .g2,.g3{grid-template-columns:1fr}.ops.c2{grid-template-columns:1fr}
+  .barra{padding:11px 20px}.envio{padding:48px 22px}
+  .rgpd-fila{grid-template-columns:1fr;gap:6px}
+  .modal{padding:40px 28px}
+}
+</style>
+</head>
+<body>
+
+<header class="portada">
+  <span class="port-eye">Cuestionario de Evaluación</span>
+  <div class="port-orn"><div class="port-rombo"></div></div>
+  <h1>Nutrición<br><em>&amp; Bienestar</em></h1>
+  <p class="port-sub">Tómate el tiempo que necesites para responder con honestidad. Cada respuesta nos permitirá diseñar un programa completamente adaptado a ti, a tu historia y a tu forma de vivir.</p>
+  <p class="port-firma">Kiko Martínez &nbsp;·&nbsp; Terapeuta Natural &nbsp;·&nbsp; Tu bienestar, mi máxima prioridad</p>
+</header>
+
+<div class="barra">
+  <span class="barra-lbl">Progreso</span>
+  <div class="barra-pista"><div class="barra-fill" id="bFill"></div></div>
+  <span class="barra-num" id="bNum">0%</span>
+</div>
+
+<div class="wrap">
+<form id="form">
+
+<!-- 01 DATOS PERSONALES -->
+<div class="sec">
+  <div class="sec-cab">
+    <div class="sec-acento" style="background:var(--verde)"></div>
+    <div><div class="sec-num">Sección 01 — 10</div><h2>Datos Personales</h2></div>
+    <p>Información básica para conocerte mejor</p>
+  </div>
+  <div class="sec-body">
+    <div class="g2">
+      <div class="pq"><label class="ql" for="nombre">Nombre completo <span class="req">*</span></label><input type="text" id="nombre" name="nombre" placeholder="Nombre y apellidos"></div>
+      <div class="pq"><label class="ql" for="email">Correo electrónico <span class="req">*</span></label><input type="email" id="email" name="email" placeholder="tu@correo.com"></div>
+    </div>
+    <div class="g2" style="margin-top:18px">
+      <div class="pq"><label class="ql" for="telefono">Teléfono</label><input type="tel" id="telefono" name="telefono" placeholder="+34 000 000 000"></div>
+      <div class="pq"><label class="ql" for="fnac">Fecha de nacimiento</label><input type="text" id="fnac" name="fnac" placeholder="DD / MM / AAAA"></div>
+    </div>
+    <div class="g2" style="margin-top:18px">
+      <div class="pq">
+        <label class="ql">Género</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="genero" id="gm" value="Mujer"><label for="gm">Mujer</label></div>
+          <div class="op"><input type="radio" name="genero" id="gh" value="Hombre"><label for="gh">Hombre</label></div>
+          <div class="op"><input type="radio" name="genero" id="gnb" value="No binario"><label for="gnb">No binario</label></div>
+          <div class="op"><input type="radio" name="genero" id="gns" value="Prefiero no indicar"><label for="gns">Prefiero no indicar</label></div>
+        </div>
+      </div>
+      <div class="pq"><label class="ql" for="ecivil">Estado civil</label>
+        <select name="ecivil" id="ecivil">
+          <option value="">Selecciona…</option>
+          <option>Soltero/a</option><option>En pareja (sin convivencia)</option>
+          <option>En pareja (con convivencia)</option><option>Casado/a</option>
+          <option>Divorciado/a · Separado/a</option><option>Viudo/a</option>
+        </select>
+      </div>
+    </div>
+    <div class="g3" style="margin-top:18px">
+      <div class="pq"><label class="ql" for="peso">Peso actual (kg)</label><input type="number" id="peso" name="peso" placeholder="72"></div>
+      <div class="pq"><label class="ql" for="estatura">Estatura (cm)</label><input type="number" id="estatura" name="estatura" placeholder="168"></div>
+      <div class="pq"><label class="ql" for="pesoobj">Peso objetivo (kg)</label><input type="number" id="pesoobj" name="pesoobj" placeholder="62"></div>
+    </div>
+    <div class="pq" style="margin-top:18px">
+      <label class="ql">Ocupación laboral</label>
+      <div class="ops">
+        <div class="op"><input type="radio" name="ocupacion" id="oc1" value="Trabajo sedentario (oficina o teletrabajo)"><label for="oc1">Trabajo sedentario (oficina / teletrabajo)</label></div>
+        <div class="op"><input type="radio" name="ocupacion" id="oc2" value="Trabajo activo (de pie o en movimiento)"><label for="oc2">Trabajo activo (de pie, en movimiento)</label></div>
+        <div class="op"><input type="radio" name="ocupacion" id="oc3" value="Trabajo físicamente exigente"><label for="oc3">Trabajo físicamente exigente</label></div>
+        <div class="op"><input type="radio" name="ocupacion" id="oc4" value="Turnos irregulares o nocturnos"><label for="oc4">Turnos irregulares o nocturnos</label></div>
+        <div class="op"><input type="radio" name="ocupacion" id="oc5" value="Actualmente sin empleo"><label for="oc5">Actualmente sin empleo</label></div>
+        <div class="op"><input type="radio" name="ocupacion" id="oc6" value="Jubilado/a"><label for="oc6">Jubilado/a</label></div>
+      </div>
+    </div>
+    <div class="pq" style="margin-top:18px"><label class="ql" for="conviv">¿Con quién convives?<span class="hint">Ej: solo/a, con pareja, con hijos, con familia…</span></label><textarea id="conviv" name="conviv" placeholder="Describe brevemente tu situación de convivencia…"></textarea></div>
+  </div>
+</div>
+
+<!-- 02 OBJETIVOS -->
+<div class="sec">
+  <div class="sec-cab">
+    <div class="sec-acento" style="background:var(--oro)"></div>
+    <div><div class="sec-num">Sección 02 — 10</div><h2>Tus Objetivos</h2></div>
+    <p>Entender lo que buscas para trazar el camino</p>
+  </div>
+  <div class="sec-body">
+    <div class="pq">
+      <label class="ql">¿Cuáles son tus principales objetivos?<span class="hint">Puedes marcar varios.</span></label>
+      <div class="ops">
+        <div class="op"><input type="checkbox" name="obj_perder"  id="ob1"  value="Perder peso"><label for="ob1">Perder peso</label></div>
+        <div class="op"><input type="checkbox" name="obj_mant"    id="ob2"  value="Mantener el peso actual"><label for="ob2">Mantener el peso actual</label></div>
+        <div class="op"><input type="checkbox" name="obj_energ"   id="ob3"  value="Mejorar la energía y vitalidad"><label for="ob3">Mejorar energía y vitalidad</label></div>
+        <div class="op"><input type="checkbox" name="obj_digest"  id="ob4"  value="Mejorar la digestión"><label for="ob4">Mejorar la digestión</label></div>
+        <div class="op"><input type="checkbox" name="obj_musc"    id="ob5"  value="Ganar o tonificar músculo"><label for="ob5">Ganar o tonificar músculo</label></div>
+        <div class="op"><input type="checkbox" name="obj_inflam"  id="ob6"  value="Reducir inflamación"><label for="ob6">Reducir inflamación</label></div>
+        <div class="op"><input type="checkbox" name="obj_estres"  id="ob7"  value="Reducir ansiedad y estrés"><label for="ob7">Reducir ansiedad y estrés</label></div>
+        <div class="op"><input type="checkbox" name="obj_sueno"   id="ob8"  value="Mejorar el sueño"><label for="ob8">Mejorar el sueño</label></div>
+        <div class="op"><input type="checkbox" name="obj_salud"   id="ob9"  value="Mejorar analíticas y salud general"><label for="ob9">Mejorar analíticas y salud</label></div>
+        <div class="op"><input type="checkbox" name="obj_relac"   id="ob10" value="Mejorar la relación con la comida"><label for="ob10">Mejorar la relación con la comida</label></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="pq"><label class="ql" for="motivacion">¿Qué te ha motivado a buscar este cambio ahora?<span class="hint">Lo que te ha impulsado en este momento concreto.</span></label><textarea id="motivacion" name="motivacion" placeholder="Cuéntame qué te ha traído hasta aquí…"></textarea></div>
+    <div class="g2" style="margin-top:18px">
+      <div class="pq">
+        <label class="ql">¿Cuánto tiempo llevas queriendo cambiar?</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="tcambio" id="tc1" value="Menos de 1 mes"><label for="tc1">Menos de 1 mes</label></div>
+          <div class="op"><input type="radio" name="tcambio" id="tc2" value="1 a 6 meses"><label for="tc2">1 – 6 meses</label></div>
+          <div class="op"><input type="radio" name="tcambio" id="tc3" value="6 a 12 meses"><label for="tc3">6 – 12 meses</label></div>
+          <div class="op"><input type="radio" name="tcambio" id="tc4" value="Más de 1 año"><label for="tc4">Más de 1 año</label></div>
+        </div>
+      </div>
+      <div class="pq">
+        <label class="ql">¿En qué plazo esperas resultados?</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="plazo" id="pl1" value="1 mes"><label for="pl1">1 mes</label></div>
+          <div class="op"><input type="radio" name="plazo" id="pl2" value="3 meses"><label for="pl2">3 meses</label></div>
+          <div class="op"><input type="radio" name="plazo" id="pl3" value="6 meses"><label for="pl3">6 meses</label></div>
+          <div class="op"><input type="radio" name="plazo" id="pl4" value="Sin prisa, largo plazo"><label for="pl4">Sin prisa, largo plazo</label></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 03 SALUD -->
+<div class="sec">
+  <div class="sec-cab">
+    <div class="sec-acento" style="background:var(--tierra)"></div>
+    <div><div class="sec-num">Sección 03 — 10</div><h2>Historial de Salud</h2></div>
+    <p>Información médica relevante para personalizar tu programa con seguridad</p>
+  </div>
+  <div class="sec-body">
+    <div class="pq">
+      <label class="ql">¿Padeces o has padecido alguna de las siguientes condiciones?<span class="hint">Marca todas las que correspondan.</span></label>
+      <div class="ops">
+        <div class="op"><input type="checkbox" name="cond_diab"  id="cd1"  value="Diabetes tipo 2"><label for="cd1">Diabetes tipo 2</label></div>
+        <div class="op"><input type="checkbox" name="cond_ins"   id="cd2"  value="Resistencia a la insulina / prediabetes"><label for="cd2">Resistencia a la insulina</label></div>
+        <div class="op"><input type="checkbox" name="cond_tir"   id="cd3"  value="Problemas de tiroides"><label for="cd3">Problemas de tiroides</label></div>
+        <div class="op"><input type="checkbox" name="cond_card"  id="cd4"  value="Enfermedad cardiovascular"><label for="cd4">Enfermedad cardiovascular</label></div>
+        <div class="op"><input type="checkbox" name="cond_hip"   id="cd5"  value="Hipertensión"><label for="cd5">Hipertensión</label></div>
+        <div class="op"><input type="checkbox" name="cond_col"   id="cd6"  value="Colesterol o triglicéridos elevados"><label for="cd6">Colesterol elevado</label></div>
+        <div class="op"><input type="checkbox" name="cond_sop"   id="cd7"  value="SOP"><label for="cd7">SOP</label></div>
+        <div class="op"><input type="checkbox" name="cond_dig"   id="cd8"  value="Digestivo crónico (SII, Crohn, colitis)"><label for="cd8">Digestivo crónico (SII, Crohn…)</label></div>
+        <div class="op"><input type="checkbox" name="cond_hig"   id="cd9"  value="Hígado graso"><label for="cd9">Hígado graso</label></div>
+        <div class="op"><input type="checkbox" name="cond_ren"   id="cd10" value="Enfermedad renal"><label for="cd10">Enfermedad renal</label></div>
+        <div class="op"><input type="checkbox" name="cond_anx"   id="cd11" value="Ansiedad o depresión diagnosticadas"><label for="cd11">Ansiedad · Depresión</label></div>
+        <div class="op"><input type="checkbox" name="cond_tca"   id="cd12" value="Trastorno de conducta alimentaria (TCA)"><label for="cd12">TCA (pasado o presente)</label></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="pq"><label class="ql" for="otras_cond">Otras condiciones relevantes</label><textarea id="otras_cond" name="otras_cond" placeholder="Cualquier condición que no aparezca arriba…"></textarea></div>
+    <div class="pq" style="margin-top:18px"><label class="ql" for="medicacion">Medicación actual<span class="hint">Incluye anticonceptivos, antidepresivos, medicación tiroidea…</span></label><textarea id="medicacion" name="medicacion" placeholder="Lista los medicamentos y suplementos que tomas…"></textarea></div>
+    <div class="pq" style="margin-top:18px"><label class="ql" for="alergias">Alergias o intolerancias alimentarias</label><textarea id="alergias" name="alergias" placeholder="Ej: intolerancia al gluten, alergia a frutos secos, lactosa…"></textarea></div>
+    <div class="g2" style="margin-top:18px">
+      <div class="pq">
+        <label class="ql">Analíticas de sangre recientes</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="analiticas" id="an1" value="Sí, en el último año"><label for="an1">Sí, último año</label></div>
+          <div class="op"><input type="radio" name="analiticas" id="an2" value="Hace más de 1 año"><label for="an2">Hace más de 1 año</label></div>
+          <div class="op"><input type="radio" name="analiticas" id="an3" value="Hace mucho tiempo"><label for="an3">Hace mucho tiempo</label></div>
+          <div class="op"><input type="radio" name="analiticas" id="an4" value="Nunca"><label for="an4">Nunca</label></div>
+        </div>
+      </div>
+      <div class="pq">
+        <label class="ql">¿Embarazada o en lactancia?</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="embarazo" id="em1" value="Sí, embarazada"><label for="em1">Embarazada</label></div>
+          <div class="op"><input type="radio" name="embarazo" id="em2" value="En lactancia"><label for="em2">En lactancia</label></div>
+          <div class="op"><input type="radio" name="embarazo" id="em3" value="No"><label for="em3">No</label></div>
+          <div class="op"><input type="radio" name="embarazo" id="em4" value="No aplica"><label for="em4">No aplica</label></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 04 HÁBITOS ALIMENTARIOS -->
+<div class="sec">
+  <div class="sec-cab">
+    <div class="sec-acento" style="background:var(--verde)"></div>
+    <div><div class="sec-num">Sección 04 — 10</div><h2>Hábitos Alimentarios</h2></div>
+    <p>Queremos conocer cómo comes hoy, sin juicios ni etiquetas</p>
+  </div>
+  <div class="sec-body">
+    <div class="pq">
+      <label class="ql">¿Sigues algún tipo de alimentación especial?</label>
+      <div class="ops">
+        <div class="op"><input type="radio" name="tipoalim" id="ta1" value="Omnívora (como de todo)"><label for="ta1">Omnívora — como de todo</label></div>
+        <div class="op"><input type="radio" name="tipoalim" id="ta2" value="Vegetariana"><label for="ta2">Vegetariana</label></div>
+        <div class="op"><input type="radio" name="tipoalim" id="ta3" value="Vegana"><label for="ta3">Vegana</label></div>
+        <div class="op"><input type="radio" name="tipoalim" id="ta4" value="Pescetariana"><label for="ta4">Pescetariana</label></div>
+        <div class="op"><input type="radio" name="tipoalim" id="ta5" value="Sin gluten"><label for="ta5">Sin gluten</label></div>
+        <div class="op"><input type="radio" name="tipoalim" id="ta6" value="Cetogénica o low carb"><label for="ta6">Cetogénica · Low carb</label></div>
+        <div class="op"><input type="radio" name="tipoalim" id="ta7" value="Mediterránea"><label for="ta7">Mediterránea</label></div>
+        <div class="op"><input type="radio" name="tipoalim" id="ta8" value="Sin patrón específico"><label for="ta8">Sin patrón específico</label></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="g2">
+      <div class="pq">
+        <label class="ql">Número de comidas al día</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="ncomidas" id="nc1" value="1-2 comidas"><label for="nc1">1 – 2</label></div>
+          <div class="op"><input type="radio" name="ncomidas" id="nc2" value="3 comidas"><label for="nc2">3</label></div>
+          <div class="op"><input type="radio" name="ncomidas" id="nc3" value="4-5 comidas"><label for="nc3">4 – 5</label></div>
+          <div class="op"><input type="radio" name="ncomidas" id="nc4" value="Sin orden, picoteo constante"><label for="nc4">Sin orden, picoteo</label></div>
+        </div>
+      </div>
+      <div class="pq">
+        <label class="ql">¿Desayunas habitualmente?</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="desayuno" id="ds1" value="Sí, siempre"><label for="ds1">Sí, siempre</label></div>
+          <div class="op"><input type="radio" name="desayuno" id="ds2" value="A veces"><label for="ds2">A veces</label></div>
+          <div class="op"><input type="radio" name="desayuno" id="ds3" value="No, nunca"><label for="ds3">No, nunca</label></div>
+          <div class="op"><input type="radio" name="desayuno" id="ds4" value="Ayuno intermitente"><label for="ds4">Ayuno intermitente</label></div>
+        </div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="pq"><label class="ql" for="d_des">Describe un desayuno típico</label><textarea id="d_des" name="d_des" placeholder="Ej: café con leche, tostada con aceite y tomate…"></textarea></div>
+    <div class="g2" style="margin-top:16px">
+      <div class="pq"><label class="ql" for="d_alm">¿Qué sueles comer a mediodía?</label><textarea id="d_alm" name="d_alm" placeholder="Describe una comida típica de mediodía…"></textarea></div>
+      <div class="pq"><label class="ql" for="d_cen">¿Qué sueles cenar?</label><textarea id="d_cen" name="d_cen" placeholder="Describe una cena típica…"></textarea></div>
+    </div>
+    <div class="pq" style="margin-top:16px"><label class="ql" for="d_pic">¿Picoteas entre horas? ¿Qué sueles tomar?</label><textarea id="d_pic" name="d_pic" placeholder="Ej: fruta, galletas, nada, café…"></textarea></div>
+    <div class="sep"></div>
+    <div class="pq">
+      <label class="ql">¿Con qué frecuencia comes fuera de casa?</label>
+      <div class="ops">
+        <div class="op"><input type="radio" name="fuera" id="fc1" value="Casi nunca"><label for="fc1">Casi nunca</label></div>
+        <div class="op"><input type="radio" name="fuera" id="fc2" value="1-2 veces por semana"><label for="fc2">1 – 2 veces / semana</label></div>
+        <div class="op"><input type="radio" name="fuera" id="fc3" value="3-4 veces por semana"><label for="fc3">3 – 4 veces / semana</label></div>
+        <div class="op"><input type="radio" name="fuera" id="fc4" value="Casi todos los días"><label for="fc4">Casi todos los días</label></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="pq">
+      <label class="ql">¿Con qué frecuencia consumes los siguientes alimentos?</label>
+      <div style="overflow-x:auto;margin-top:14px">
+        <table class="tbl"><thead><tr><th>Alimento</th><th>Nunca</th><th>Ocasional</th><th>Semanal</th><th>Diario</th></tr></thead><tbody id="tblF"></tbody></table>
+      </div>
+    </div>
+    <div class="g2" style="margin-top:18px">
+      <div class="pq"><label class="ql" for="alimev">Alimentos que no comerías bajo ninguna circunstancia</label><textarea id="alimev" name="alimev" placeholder="Por gusto, ética, religión o cultura…"></textarea></div>
+      <div class="pq"><label class="ql" for="alimfav">Tus alimentos favoritos</label><textarea id="alimfav" name="alimfav" placeholder="Los que más disfrutas…"></textarea></div>
+    </div>
+  </div>
+</div>
+
+<!-- 05 HIDRATACIÓN -->
+<div class="sec">
+  <div class="sec-cab">
+    <div class="sec-acento" style="background:var(--azul)"></div>
+    <div><div class="sec-num">Sección 05 — 10</div><h2>Hidratación y Bebidas</h2></div>
+    <p>Lo que bebes es tan importante como lo que comes</p>
+  </div>
+  <div class="sec-body">
+    <div class="g2">
+      <div class="pq">
+        <label class="ql">Agua al día (aproximado)</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="agua" id="ag1" value="Menos de 1 litro"><label for="ag1">Menos de 1 L</label></div>
+          <div class="op"><input type="radio" name="agua" id="ag2" value="1 a 1,5 litros"><label for="ag2">1 – 1,5 L</label></div>
+          <div class="op"><input type="radio" name="agua" id="ag3" value="1,5 a 2 litros"><label for="ag3">1,5 – 2 L</label></div>
+          <div class="op"><input type="radio" name="agua" id="ag4" value="Más de 2 litros"><label for="ag4">Más de 2 L</label></div>
+        </div>
+      </div>
+      <div class="pq">
+        <label class="ql">¿Sientes sed con facilidad?</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="sed" id="sd1" value="Sí, y bebo suficiente"><label for="sd1">Sí, y bebo bien</label></div>
+          <div class="op"><input type="radio" name="sed" id="sd2" value="Me olvido de beber"><label for="sd2">Me olvido de beber</label></div>
+          <div class="op"><input type="radio" name="sed" id="sd3" value="Tengo sed constante"><label for="sd3">Sed constante</label></div>
+          <div class="op"><input type="radio" name="sed" id="sd4" value="Raramente siento sed"><label for="sd4">Raramente</label></div>
+        </div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="g2">
+      <div class="pq">
+        <label class="ql">Consumo de alcohol</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="alcohol" id="al1" value="No consumo alcohol"><label for="al1">No consumo</label></div>
+          <div class="op"><input type="radio" name="alcohol" id="al2" value="Ocasionalmente"><label for="al2">Ocasionalmente</label></div>
+          <div class="op"><input type="radio" name="alcohol" id="al3" value="Los fines de semana"><label for="al3">Fines de semana</label></div>
+          <div class="op"><input type="radio" name="alcohol" id="al4" value="Varias veces por semana"><label for="al4">Varias veces / semana</label></div>
+          <div class="op"><input type="radio" name="alcohol" id="al5" value="Diariamente"><label for="al5">Diariamente</label></div>
+        </div>
+      </div>
+      <div class="pq">
+        <label class="ql">Cafés o bebidas con cafeína al día</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="cafe" id="ca1" value="Ninguno"><label for="ca1">Ninguno</label></div>
+          <div class="op"><input type="radio" name="cafe" id="ca2" value="1-2"><label for="ca2">1 – 2</label></div>
+          <div class="op"><input type="radio" name="cafe" id="ca3" value="3-4"><label for="ca3">3 – 4</label></div>
+          <div class="op"><input type="radio" name="cafe" id="ca4" value="Más de 4"><label for="ca4">Más de 4</label></div>
+        </div>
+      </div>
+    </div>
+    <div class="pq" style="margin-top:18px"><label class="ql" for="otbeb">¿Consumes refrescos, zumos industriales, bebidas energéticas u otras bebidas azucaradas?</label><textarea id="otbeb" name="otbeb" placeholder="Describe qué bebes y con qué frecuencia…"></textarea></div>
+  </div>
+</div>
+
+<!-- 06 ACTIVIDAD Y SUEÑO -->
+<div class="sec">
+  <div class="sec-cab">
+    <div class="sec-acento" style="background:var(--tm)"></div>
+    <div><div class="sec-num">Sección 06 — 10</div><h2>Actividad Física y Sueño</h2></div>
+    <p>El movimiento y el descanso son pilares fundamentales del bienestar</p>
+  </div>
+  <div class="sec-body">
+    <div class="pq">
+      <label class="ql">¿Realizas ejercicio físico de forma habitual?</label>
+      <div class="ops">
+        <div class="op"><input type="radio" name="ejercicio" id="ej1" value="No hago ejercicio"><label for="ej1">No hago ejercicio</label></div>
+        <div class="op"><input type="radio" name="ejercicio" id="ej2" value="Poco (paseos ocasionales)"><label for="ej2">Poco (paseos ocasionales)</label></div>
+        <div class="op"><input type="radio" name="ejercicio" id="ej3" value="1-2 días por semana"><label for="ej3">1 – 2 días / semana</label></div>
+        <div class="op"><input type="radio" name="ejercicio" id="ej4" value="3-4 días por semana"><label for="ej4">3 – 4 días / semana</label></div>
+        <div class="op"><input type="radio" name="ejercicio" id="ej5" value="5 o más días por semana"><label for="ej5">5 o más días / semana</label></div>
+      </div>
+    </div>
+    <div class="pq" style="margin-top:18px">
+      <label class="ql">¿Qué tipo de ejercicio practicas?<span class="hint">Puedes marcar varios.</span></label>
+      <div class="ops">
+        <div class="op"><input type="checkbox" name="tipoej" id="te1" value="Caminar o senderismo"><label for="te1">Caminar · Senderismo</label></div>
+        <div class="op"><input type="checkbox" name="tipoej" id="te2" value="Correr"><label for="te2">Correr</label></div>
+        <div class="op"><input type="checkbox" name="tipoej" id="te3" value="Ciclismo"><label for="te3">Ciclismo</label></div>
+        <div class="op"><input type="checkbox" name="tipoej" id="te4" value="Musculación o gimnasio"><label for="te4">Musculación · Gimnasio</label></div>
+        <div class="op"><input type="checkbox" name="tipoej" id="te5" value="Yoga o Pilates"><label for="te5">Yoga · Pilates</label></div>
+        <div class="op"><input type="checkbox" name="tipoej" id="te6" value="Natación"><label for="te6">Natación</label></div>
+        <div class="op"><input type="checkbox" name="tipoej" id="te7" value="Deportes de equipo"><label for="te7">Deportes de equipo</label></div>
+        <div class="op"><input type="checkbox" name="tipoej" id="te8" value="Otro"><label for="te8">Otro</label></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="g2">
+      <div class="pq">
+        <label class="ql">Horas de sueño habituales</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="hsueno" id="hs1" value="Menos de 5 h"><label for="hs1">Menos de 5 h</label></div>
+          <div class="op"><input type="radio" name="hsueno" id="hs2" value="5-6 h"><label for="hs2">5 – 6 h</label></div>
+          <div class="op"><input type="radio" name="hsueno" id="hs3" value="7-8 h"><label for="hs3">7 – 8 h</label></div>
+          <div class="op"><input type="radio" name="hsueno" id="hs4" value="Más de 8 h"><label for="hs4">Más de 8 h</label></div>
+        </div>
+      </div>
+      <div class="pq">
+        <label class="ql">¿Cenas después de las 21 h?</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="cenatard" id="ct1" value="Nunca o casi nunca"><label for="ct1">Nunca</label></div>
+          <div class="op"><input type="radio" name="cenatard" id="ct2" value="A veces"><label for="ct2">A veces</label></div>
+          <div class="op"><input type="radio" name="cenatard" id="ct3" value="Frecuentemente"><label for="ct3">Frecuentemente</label></div>
+          <div class="op"><input type="radio" name="cenatard" id="ct4" value="Siempre"><label for="ct4">Siempre</label></div>
+        </div>
+      </div>
+    </div>
+    <div class="pq" style="margin-top:18px">
+      <label class="ql">Calidad del sueño</label>
+      <div class="esc"><div class="esc-labs"><span>Muy mala</span><span>Excelente</span></div>
+      <div class="esc-nums">
+        <div class="esc-n"><input type="radio" name="calsueno" id="cs1" value="1"><label for="cs1">1</label></div>
+        <div class="esc-n"><input type="radio" name="calsueno" id="cs2" value="2"><label for="cs2">2</label></div>
+        <div class="esc-n"><input type="radio" name="calsueno" id="cs3" value="3"><label for="cs3">3</label></div>
+        <div class="esc-n"><input type="radio" name="calsueno" id="cs4" value="4"><label for="cs4">4</label></div>
+        <div class="esc-n"><input type="radio" name="calsueno" id="cs5" value="5"><label for="cs5">5</label></div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 07 RELACIÓN EMOCIONAL -->
+<div class="sec">
+  <div class="sec-cab">
+    <div class="sec-acento" style="background:var(--td)"></div>
+    <div><div class="sec-num">Sección 07 — 10</div><h2>Relación Emocional con la Comida</h2></div>
+    <p>Apartado confidencial. Responde con total libertad, sin ningún tipo de juicio</p>
+  </div>
+  <div class="sec-body">
+    <div class="pq">
+      <label class="ql">¿Cómo describirías tu relación general con la comida?</label>
+      <div class="ops c1">
+        <div class="op"><input type="radio" name="relcomida" id="rc1" value="Sana y equilibrada: disfruto sin culpa"><label for="rc1">Sana y equilibrada — como para vivir y disfruto sin culpa</label></div>
+        <div class="op"><input type="radio" name="relcomida" id="rc2" value="Algo compleja: a veces me siento culpable"><label for="rc2">Algo compleja — a veces me siento culpable después de comer</label></div>
+        <div class="op"><input type="radio" name="relcomida" id="rc3" value="Complicada: genera ansiedad o preocupación con frecuencia"><label for="rc3">Complicada — la comida me genera ansiedad o preocupación con frecuencia</label></div>
+        <div class="op"><input type="radio" name="relcomida" id="rc4" value="Muy complicada: fuente de angustia importante en mi vida"><label for="rc4">Muy complicada — es una fuente importante de angustia en mi vida</label></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="pq">
+      <label class="ql">¿Comes cuando estás emocionalmente alterado/a?<span class="hint">Por estrés, tristeza, aburrimiento, ansiedad…</span></label>
+      <div class="ops">
+        <div class="op"><input type="radio" name="comemoc" id="ce1" value="Nunca o casi nunca"><label for="ce1">Nunca o casi nunca</label></div>
+        <div class="op"><input type="radio" name="comemoc" id="ce2" value="A veces"><label for="ce2">A veces</label></div>
+        <div class="op"><input type="radio" name="comemoc" id="ce3" value="Con bastante frecuencia"><label for="ce3">Con bastante frecuencia</label></div>
+        <div class="op"><input type="radio" name="comemoc" id="ce4" value="Sí, es mi principal detonante para comer"><label for="ce4">Sí, es mi principal detonante</label></div>
+      </div>
+    </div>
+    <div class="pq" style="margin-top:18px">
+      <label class="ql">¿Qué emociones te suelen llevar a comer sin hambre?<span class="hint">Marca todas las que reconoces en ti.</span></label>
+      <div class="ops">
+        <div class="op"><input type="checkbox" name="emociones_comer" id="ec1" value="Estrés"><label for="ec1">Estrés</label></div>
+        <div class="op"><input type="checkbox" name="emociones_comer" id="ec2" value="Tristeza"><label for="ec2">Tristeza</label></div>
+        <div class="op"><input type="checkbox" name="emociones_comer" id="ec3" value="Ansiedad"><label for="ec3">Ansiedad</label></div>
+        <div class="op"><input type="checkbox" name="emociones_comer" id="ec4" value="Aburrimiento"><label for="ec4">Aburrimiento</label></div>
+        <div class="op"><input type="checkbox" name="emociones_comer" id="ec5" value="Soledad"><label for="ec5">Soledad</label></div>
+        <div class="op"><input type="checkbox" name="emociones_comer" id="ec6" value="Celebración o alegría"><label for="ec6">Celebración · Alegría</label></div>
+        <div class="op"><input type="checkbox" name="emociones_comer" id="ec7" value="Cansancio"><label for="ec7">Cansancio</label></div>
+        <div class="op"><input type="checkbox" name="emociones_comer" id="ec8" value="Ninguna de estas"><label for="ec8">Ninguna de estas</label></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="pq">
+      <label class="ql">¿Sientes que pierdes el control al empezar a comer ciertos alimentos?</label>
+      <div class="ops">
+        <div class="op"><input type="radio" name="control" id="pc1" value="No, tengo buen control"><label for="pc1">No, tengo buen control</label></div>
+        <div class="op"><input type="radio" name="control" id="pc2" value="A veces con algunos alimentos concretos"><label for="pc2">A veces, con algunos alimentos</label></div>
+        <div class="op"><input type="radio" name="control" id="pc3" value="Frecuentemente"><label for="pc3">Frecuentemente</label></div>
+        <div class="op"><input type="radio" name="control" id="pc4" value="Sí, es un patrón habitual en mí"><label for="pc4">Sí, es un patrón habitual</label></div>
+      </div>
+    </div>
+    <div class="g2" style="margin-top:18px">
+      <div class="pq">
+        <label class="ql">Nivel de estrés cotidiano</label>
+        <div class="esc"><div class="esc-labs"><span>Sin estrés</span><span>Extremo</span></div>
+        <div class="esc-nums">
+          <div class="esc-n"><input type="radio" name="nestres" id="ne1" value="1"><label for="ne1">1</label></div>
+          <div class="esc-n"><input type="radio" name="nestres" id="ne2" value="2"><label for="ne2">2</label></div>
+          <div class="esc-n"><input type="radio" name="nestres" id="ne3" value="3"><label for="ne3">3</label></div>
+          <div class="esc-n"><input type="radio" name="nestres" id="ne4" value="4"><label for="ne4">4</label></div>
+          <div class="esc-n"><input type="radio" name="nestres" id="ne5" value="5"><label for="ne5">5</label></div>
+        </div></div>
+      </div>
+      <div class="pq">
+        <label class="ql">Autopercepción corporal actual</label>
+        <div class="esc"><div class="esc-labs"><span>Muy mal</span><span>Muy bien</span></div>
+        <div class="esc-nums">
+          <div class="esc-n"><input type="radio" name="autopercep" id="ap1" value="1"><label for="ap1">1</label></div>
+          <div class="esc-n"><input type="radio" name="autopercep" id="ap2" value="2"><label for="ap2">2</label></div>
+          <div class="esc-n"><input type="radio" name="autopercep" id="ap3" value="3"><label for="ap3">3</label></div>
+          <div class="esc-n"><input type="radio" name="autopercep" id="ap4" value="4"><label for="ap4">4</label></div>
+          <div class="esc-n"><input type="radio" name="autopercep" id="ap5" value="5"><label for="ap5">5</label></div>
+        </div></div>
+      </div>
+    </div>
+    <div class="pq" style="margin-top:18px">
+      <label class="ql">¿Tienes pensamientos recurrentes sobre la comida, el peso o tu cuerpo?</label>
+      <div class="ops">
+        <div class="op"><input type="radio" name="pensamtos" id="pt1" value="Raramente"><label for="pt1">Raramente</label></div>
+        <div class="op"><input type="radio" name="pensamtos" id="pt2" value="A veces"><label for="pt2">A veces</label></div>
+        <div class="op"><input type="radio" name="pensamtos" id="pt3" value="Con frecuencia"><label for="pt3">Con frecuencia</label></div>
+        <div class="op"><input type="radio" name="pensamtos" id="pt4" value="Prácticamente a diario"><label for="pt4">Prácticamente a diario</label></div>
+      </div>
+    </div>
+    <div class="pq" style="margin-top:18px"><label class="ql" for="notasemoc">¿Algo más sobre tu relación con la comida o tu cuerpo?<span class="hint">Espacio confidencial y abierto. Escribe con total libertad.</span></label><textarea id="notasemoc" name="notasemoc" placeholder="Todo lo que quieras compartir…" style="min-height:96px"></textarea></div>
+  </div>
+</div>
+
+<!-- 08 HISTORIAL DIETAS -->
+<div class="sec">
+  <div class="sec-cab">
+    <div class="sec-acento" style="background:var(--oro)"></div>
+    <div><div class="sec-num">Sección 08 — 10</div><h2>Historial de Dietas</h2></div>
+    <p>Aprender de tu historia para no repetir lo que no funcionó</p>
+  </div>
+  <div class="sec-body">
+    <div class="pq">
+      <label class="ql">¿Has seguido dietas o programas de alimentación anteriormente?</label>
+      <div class="ops">
+        <div class="op"><input type="radio" name="dprev" id="dp1" value="No, nunca"><label for="dp1">No, nunca</label></div>
+        <div class="op"><input type="radio" name="dprev" id="dp2" value="1-2 veces"><label for="dp2">1 – 2 veces</label></div>
+        <div class="op"><input type="radio" name="dprev" id="dp3" value="Varias veces (3-5)"><label for="dp3">Varias veces (3 – 5)</label></div>
+        <div class="op"><input type="radio" name="dprev" id="dp4" value="Muchas veces, llevo años a dieta"><label for="dp4">Muchas — llevo años a dieta</label></div>
+      </div>
+    </div>
+    <div class="pq" style="margin-top:18px"><label class="ql" for="dcuals">¿Qué tipo de dietas has probado?</label><textarea id="dcuals" name="dcuals" placeholder="Ej: Dukan, ayuno intermitente, contar calorías, keto…"></textarea></div>
+    <div class="g2" style="margin-top:16px">
+      <div class="pq"><label class="ql" for="dbien">¿Qué funcionó bien?</label><textarea id="dbien" name="dbien" placeholder="Lo que te resultó útil o motivador…"></textarea></div>
+      <div class="pq"><label class="ql" for="dmal">¿Por qué lo abandonaste?</label><textarea id="dmal" name="dmal" placeholder="Obstáculos, dificultades para mantenerlo…"></textarea></div>
+    </div>
+    <div class="pq" style="margin-top:18px">
+      <label class="ql">¿Tienes tendencia al efecto rebote?</label>
+      <div class="ops">
+        <div class="op"><input type="radio" name="rebote" id="rb1" value="No, suelo mantener los cambios"><label for="rb1">No, suelo mantener los cambios</label></div>
+        <div class="op"><input type="radio" name="rebote" id="rb2" value="A veces recupero algo del peso perdido"><label for="rb2">A veces recupero algo</label></div>
+        <div class="op"><input type="radio" name="rebote" id="rb3" value="Sí, suelo recuperar todo el peso perdido"><label for="rb3">Sí, suelo recuperar todo</label></div>
+        <div class="op"><input type="radio" name="rebote" id="rb4" value="Sí, incluso supero el peso inicial"><label for="rb4">Sí, incluso supero el peso inicial</label></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 09 LOGÍSTICA -->
+<div class="sec">
+  <div class="sec-cab">
+    <div class="sec-acento" style="background:var(--verde)"></div>
+    <div><div class="sec-num">Sección 09 — 10</div><h2>Logística y Vida Cotidiana</h2></div>
+    <p>Para que el programa se adapte a tu vida real, no al revés</p>
+  </div>
+  <div class="sec-body">
+    <div class="g2">
+      <div class="pq">
+        <label class="ql">¿Quién cocina habitualmente en casa?</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="quiencoc" id="qc1" value="Yo mismo/a"><label for="qc1">Yo mismo/a</label></div>
+          <div class="op"><input type="radio" name="quiencoc" id="qc2" value="Otra persona del hogar"><label for="qc2">Otra persona</label></div>
+          <div class="op"><input type="radio" name="quiencoc" id="qc3" value="Compartido"><label for="qc3">Compartido</label></div>
+          <div class="op"><input type="radio" name="quiencoc" id="qc4" value="Casi no cocinamos en casa"><label for="qc4">Casi no cocinamos</label></div>
+        </div>
+      </div>
+      <div class="pq">
+        <label class="ql">Tiempo disponible para cocinar al día</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="tcocina" id="tco1" value="Menos de 15 min"><label for="tco1">Menos de 15 min</label></div>
+          <div class="op"><input type="radio" name="tcocina" id="tco2" value="15-30 min"><label for="tco2">15 – 30 min</label></div>
+          <div class="op"><input type="radio" name="tcocina" id="tco3" value="30-60 min"><label for="tco3">30 – 60 min</label></div>
+          <div class="op"><input type="radio" name="tcocina" id="tco4" value="Más de 1 hora, disfruto cocinando"><label for="tco4">+1 h, disfruto cocinando</label></div>
+        </div>
+      </div>
+    </div>
+    <div class="g2" style="margin-top:18px">
+      <div class="pq">
+        <label class="ql">Presupuesto semanal para alimentación</label>
+        <div class="ops c2">
+          <div class="op"><input type="radio" name="presup" id="pr1" value="Menos de 50€ por semana"><label for="pr1">Menos de 50 €</label></div>
+          <div class="op"><input type="radio" name="presup" id="pr2" value="50-100€ por semana"><label for="pr2">50 – 100 €</label></div>
+          <div class="op"><input type="radio" name="presup" id="pr3" value="100-150€ por semana"><label for="pr3">100 – 150 €</label></div>
+          <div class="op"><input type="radio" name="presup" id="pr4" value="Más de 150€ por semana"><label for="pr4">Más de 150 €</label></div>
+        </div>
+      </div>
+      <div class="pq">
+        <label class="ql">Habilidad culinaria</label>
+        <div class="esc"><div class="esc-labs"><span>No sé cocinar</span><span>Experto/a</span></div>
+        <div class="esc-nums">
+          <div class="esc-n"><input type="radio" name="habilidad" id="hb1" value="1"><label for="hb1">1</label></div>
+          <div class="esc-n"><input type="radio" name="habilidad" id="hb2" value="2"><label for="hb2">2</label></div>
+          <div class="esc-n"><input type="radio" name="habilidad" id="hb3" value="3"><label for="hb3">3</label></div>
+          <div class="esc-n"><input type="radio" name="habilidad" id="hb4" value="4"><label for="hb4">4</label></div>
+          <div class="esc-n"><input type="radio" name="habilidad" id="hb5" value="5"><label for="hb5">5</label></div>
+        </div></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="pq">
+      <label class="ql">¿Cómo prefieres el seguimiento del programa?<span class="hint">Puedes marcar varias opciones.</span></label>
+      <div class="ops">
+        <div class="op"><input type="checkbox" name="seguim" id="sg1" value="Sesiones de seguimiento periódicas"><label for="sg1">Sesiones de seguimiento</label></div>
+        <div class="op"><input type="checkbox" name="seguim" id="sg2" value="Comunicación por WhatsApp"><label for="sg2">WhatsApp</label></div>
+        <div class="op"><input type="checkbox" name="seguim" id="sg3" value="Trabajo autónomo con el plan"><label for="sg3">Trabajo autónomo</label></div>
+        <div class="op"><input type="checkbox" name="seguim" id="sg4" value="Registro diario de comidas"><label for="sg4">Registro diario</label></div>
+      </div>
+    </div>
+    <div class="pq" style="margin-top:18px"><label class="ql" for="notasfin">¿Algo más sobre tu situación o expectativas?<span class="hint">Cualquier contexto adicional que consideres importante.</span></label><textarea id="notasfin" name="notasfin" placeholder="Todo lo que quieras añadir…" style="min-height:96px"></textarea></div>
+  </div>
+</div>
+
+<!-- 10 PROTECCIÓN DE DATOS -->
+<div class="sec">
+  <div class="sec-cab">
+    <div class="sec-acento" style="background:var(--td)"></div>
+    <div><div class="sec-num">Sección 10 — 10</div><h2>Protección de Datos</h2></div>
+    <p>Tu privacidad es una prioridad. Lee con calma antes de continuar</p>
+  </div>
+  <div class="sec-body">
+
+    <div class="rgpd-wrap">
+      <div class="rgpd-fila">
+        <div class="rgpd-key">Responsable</div>
+        <div class="rgpd-val">Kiko Martínez — Terapeuta Natural y Coach Nutricional</div>
+      </div>
+      <div class="rgpd-fila">
+        <div class="rgpd-key">Finalidad</div>
+        <div class="rgpd-val">Los datos facilitados en este cuestionario se utilizarán exclusivamente para elaborar tu programa nutricional y de bienestar personalizado, así como para el seguimiento del proceso terapéutico.</div>
+      </div>
+      <div class="rgpd-fila">
+        <div class="rgpd-key">Confidencialidad</div>
+        <div class="rgpd-val">Tus datos son estrictamente confidenciales y no serán cedidos a terceros sin tu consentimiento expreso. La información médica y emocional que compartes está protegida por el secreto profesional.</div>
+      </div>
+      <div class="rgpd-fila">
+        <div class="rgpd-key">Conservación</div>
+        <div class="rgpd-val">Los datos se conservarán durante el tiempo que dure la relación terapéutica y hasta un máximo de 5 años tras su finalización, conforme a la normativa aplicable.</div>
+      </div>
+      <div class="rgpd-fila">
+        <div class="rgpd-key">Base legal</div>
+        <div class="rgpd-val">Consentimiento expreso del interesado (Art. 6.1.a RGPD) y, para datos de salud, prestación de servicios de bienestar (Art. 9.2.h RGPD).</div>
+      </div>
+      <div class="rgpd-fila">
+        <div class="rgpd-key">Tus derechos</div>
+        <div class="rgpd-val">Puedes ejercer en cualquier momento tus derechos de acceso, rectificación, supresión, limitación, oposición y portabilidad contactando directamente con el responsable. También puedes retirar tu consentimiento en cualquier momento sin que ello afecte a la licitud del tratamiento anterior a dicha retirada.</div>
+      </div>
+    </div>
+
+    <div class="rgpd-nota">
+      Este cuestionario genera el PDF directamente en tu dispositivo. Ningún dato se transmite ni almacena en servidores externos. El formulario funciona de forma completamente local.
+    </div>
+
+    <div class="c-bloque">
+      <div class="c-item">
+        <input type="checkbox" name="rgpd_cons" id="rg1" value="Acepto el tratamiento de mis datos personales y de salud">
+        <div class="c-txt"><strong>He leído y acepto</strong> el tratamiento de mis datos personales y de salud para la elaboración de mi programa nutricional personalizado.<span class="c-req">*</span></div>
+      </div>
+      <div class="c-item">
+        <input type="checkbox" name="rgpd_ver" id="rg2" value="Confirmo que la información es veraz y completa">
+        <div class="c-txt">Confirmo que la información proporcionada es <strong>veraz y completa</strong>, siendo consciente de que influye directamente en la calidad de mi programa.<span class="c-req">*</span></div>
+      </div>
+      <div class="c-item">
+        <input type="checkbox" name="rgpd_com" id="rg3" value="Acepto recibir comunicaciones relacionadas con mi programa">
+        <div class="c-txt">Acepto recibir comunicaciones relacionadas con mi programa (recordatorios, actualizaciones, recursos de bienestar).<span class="c-opt">— Opcional</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ENVÍO -->
+<div class="envio">
+  <div class="envio-orn"><div class="envio-rombo"></div></div>
+  <h3>Cuestionario completado</h3>
+  <p>Gracias por tu tiempo y tu honestidad. Con esta información podremos diseñar un programa completamente adaptado a ti.</p>
+  <div class="btn-wrap">
+    <button type="button" class="btn-pdf" onclick="generarPDF()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Descargar PDF
+    </button>
+    <button type="button" class="btn-rst" onclick="limpiar()">Limpiar formulario</button>
+  </div>
+</div>
+
+</form>
+</div>
+
+<footer class="footer">Kiko Martínez <span></span> Terapeuta Natural <span></span> "Tu bienestar, mi máxima prioridad."</footer>
+
+<div class="toast" id="toast"></div>
+<div class="mbg" id="mBg">
+  <div class="modal">
+    <div class="modal-ic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h3>PDF generado</h3>
+    <p>Tu evaluación ha sido exportada correctamente. Envíasela a Kiko para recibir tu programa personalizado.</p>
+    <button class="btn-pdf" onclick="document.getElementById('mBg').classList.remove('on')" style="margin:0 auto;display:inline-flex">Cerrar</button>
+  </div>
+</div>
+
+<script>
+const ALIMS=[
+  {n:"frec_proc",l:"Alimentos ultraprocesados (bollería, snacks, precocinados)"},
+  {n:"frec_fruta",l:"Frutas frescas"},
+  {n:"frec_verd",l:"Verduras y hortalizas"},
+  {n:"frec_leg",l:"Legumbres (lentejas, garbanzos, alubias…)"},
+  {n:"frec_carne",l:"Carne roja"},
+  {n:"frec_aves",l:"Pollo, pavo u otras aves"},
+  {n:"frec_pesc",l:"Pescado y marisco"},
+  {n:"frec_huev",l:"Huevos"},
+  {n:"frec_lact",l:"Lácteos (leche, queso, yogur)"},
+  {n:"frec_azuc",l:"Azúcar añadida (dulces, postres, mermeladas)"},
+  {n:"frec_hari",l:"Pan, pasta, arroz blanco (harinas refinadas)"},
+  {n:"frec_integ",l:"Cereales integrales"},
+  {n:"frec_gras",l:"Grasas saludables (aguacate, frutos secos, AOVE)"},
+  {n:"frec_fast",l:"Comida rápida (pizza, hamburguesas…)"},
+];
+const COLS=[{c:"N",l:"Nunca"},{c:"O",l:"Ocasional"},{c:"S",l:"Semanal"},{c:"D",l:"Diario"}];
+const tb=document.getElementById("tblF");
+ALIMS.forEach(a=>{const tr=document.createElement("tr");let h=`<td>${a.l}</td>`;COLS.forEach(col=>{const id=`${a.n}_${col.c}`;h+=`<td><div class="fb"><input type="radio" name="${a.n}" id="${id}" value="${col.l}"><label for="${id}">${col.c}</label></div></td>`;});tr.innerHTML=h;tb.appendChild(tr);});
+
+function progreso(){
+  const f=document.getElementById("form");
+  const rG=new Set(),cG=new Set();let tot=0,ok=0;
+  f.querySelectorAll("input,select,textarea").forEach(el=>{if(el.type==="radio"){rG.add(el.name);return}if(el.type==="checkbox"){cG.add(el.name);return}tot++;if(el.value.trim())ok++;});
+  rG.forEach(n=>{tot++;if(f.querySelector(`input[name="${n}"]:checked`))ok++;});
+  cG.forEach(n=>{tot++;if(f.querySelector(`input[name="${n}"]:checked`))ok++;});
+  const p=Math.round(ok/tot*100);
+  document.getElementById("bFill").style.width=p+"%";
+  document.getElementById("bNum").textContent=p+"%";
+}
+document.getElementById("form").addEventListener("change",progreso);
+document.getElementById("form").addEventListener("input",progreso);
+
+function datos(){
+  const d={};const f=document.getElementById("form");const ck={};
+  f.querySelectorAll("input[type=text],input[type=number],input[type=email],input[type=tel],select,textarea").forEach(el=>{if(el.name&&el.value.trim())d[el.name]=el.value.trim();});
+  const rG={};f.querySelectorAll("input[type=radio]").forEach(r=>{rG[r.name]=true;});
+  Object.keys(rG).forEach(n=>{const c=f.querySelector(`input[name="${n}"]:checked`);if(c)d[n]=c.value;});
+  f.querySelectorAll("input[type=checkbox]").forEach(c=>{if(!ck[c.name])ck[c.name]=[];if(c.checked)ck[c.name].push(c.value);});
+  Object.keys(ck).forEach(n=>{if(ck[n].length)d[n]=ck[n].join(" · ");});
+  return d;
+}
+
+async function generarPDF(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:"p",unit:"mm",format:"a4"});
+  const d=datos();
+  const W=210,mL=20,mR=20,cW=W-mL-mR;let y=0;
+  const C={td:[83,60,36],t:[122,91,61],tl:[196,168,130],v:[84,111,87],o:[181,146,74],cr:[246,241,233],cr2:[238,231,216],bl:[253,250,244],txt:[42,28,14],s:[155,133,112],bd:[214,202,188]};
+  function NP(n=14){if(y+n>278){doc.addPage();y=22;}}
+
+  doc.setFillColor(...C.td);doc.rect(0,0,210,297,"F");
+  doc.setFillColor(...C.o);doc.rect(0,106,210,.7,"F");doc.rect(0,183,210,.7,"F");
+  doc.setTextColor(...C.tl);doc.setFontSize(7);doc.setFont("helvetica","bold");
+  doc.text("CUESTIONARIO DE EVALUACIÓN",105,88,{align:"center",charSpace:3.5});
+  doc.setTextColor(...C.bl);doc.setFontSize(30);doc.setFont("helvetica","normal");
+  doc.text("Nutrición",105,124,{align:"center"});
+  doc.setFontSize(30);doc.setFont("helvetica","italic");
+  doc.text("& Bienestar",105,143,{align:"center"});
+  doc.setFillColor(...C.o);doc.rect(84,155,42,.4,"F");
+  doc.setTextColor(...C.tl);doc.setFontSize(8.5);doc.setFont("helvetica","normal");
+  doc.text("Kiko Martínez  ·  Terapeuta Natural",105,170,{align:"center"});
+  const fecha=new Date().toLocaleDateString("es-ES",{day:"2-digit",month:"long",year:"numeric"});
+  doc.setFontSize(7.5);doc.text(`Generado el ${fecha}`,105,200,{align:"center"});
+  doc.setFontSize(7.5);doc.setFont("helvetica","italic");
+  doc.text('"Tu bienestar, mi máxima prioridad."',105,236,{align:"center"});
+
+  doc.addPage();y=22;
+
+  function sTit(t){NP(20);y+=4;doc.setFillColor(...C.cr2);doc.rect(mL,y-4,cW,12,"F");doc.setFillColor(...C.v);doc.rect(mL,y-4,3,12,"F");doc.setTextColor(...C.td);doc.setFontSize(9);doc.setFont("helvetica","bold");doc.text(t.toUpperCase(),mL+8,y+4,{charSpace:.6});y+=15;}
+
+  function campo(e,v){if(!v)return;NP(16);doc.setTextColor(...C.s);doc.setFontSize(6.5);doc.setFont("helvetica","bold");doc.text(e.toUpperCase(),mL,y,{charSpace:.4});y+=4.5;doc.setTextColor(...C.txt);doc.setFontSize(9);doc.setFont("helvetica","normal");const ls=doc.splitTextToSize(v,cW-4);ls.forEach(l=>{NP(5.5);doc.text(l,mL+2,y);y+=5;});y+=3;}
+
+  const SECS=[
+    {t:"Datos Personales",f:[["nombre","Nombre"],["email","Email"],["telefono","Teléfono"],["fnac","Fecha nacimiento"],["genero","Género"],["ecivil","Estado civil"],["peso","Peso (kg)"],["estatura","Estatura (cm)"],["pesoobj","Peso objetivo (kg)"],["ocupacion","Ocupación"],["conviv","Convivencia"]]},
+    {t:"Objetivos",f:[["obj_perder","Perder peso"],["obj_mant","Mantener peso"],["obj_energ","Energía"],["obj_digest","Digestión"],["obj_musc","Músculo"],["obj_inflam","Inflamación"],["obj_estres","Ansiedad/estrés"],["obj_sueno","Sueño"],["obj_salud","Salud general"],["obj_relac","Relación con la comida"],["motivacion","Motivación"],["tcambio","Tiempo queriendo cambiar"],["plazo","Plazo esperado"]]},
+    {t:"Historial de Salud",f:[["cond_diab","Diabetes"],["cond_ins","Resistencia insulina"],["cond_tir","Tiroides"],["cond_card","Cardiovascular"],["cond_hip","Hipertensión"],["cond_col","Colesterol"],["cond_sop","SOP"],["cond_dig","Digestivo crónico"],["cond_hig","Hígado graso"],["cond_ren","Renal"],["cond_anx","Ansiedad/Depresión"],["cond_tca","TCA"],["otras_cond","Otras condiciones"],["medicacion","Medicación"],["alergias","Alergias"],["analiticas","Analíticas"],["embarazo","Embarazo/Lactancia"]]},
+    {t:"Hábitos Alimentarios",f:[["tipoalim","Tipo alimentación"],["ncomidas","Comidas al día"],["desayuno","Desayuno"],["d_des","Desc. desayuno"],["d_alm","Desc. almuerzo"],["d_cen","Desc. cena"],["d_pic","Picoteo"],["fuera","Fuera de casa"],["alimev","Alimentos a evitar"],["alimfav","Alimentos favoritos"],["frec_proc","Frec. ultraprocesados"],["frec_fruta","Frec. frutas"],["frec_verd","Frec. verdura"],["frec_leg","Frec. legumbres"],["frec_carne","Frec. carne roja"],["frec_aves","Frec. aves"],["frec_pesc","Frec. pescado"],["frec_huev","Frec. huevos"],["frec_lact","Frec. lácteos"],["frec_azuc","Frec. azúcar"],["frec_hari","Frec. harinas refinadas"],["frec_integ","Frec. integrales"],["frec_gras","Frec. grasas saludables"],["frec_fast","Frec. comida rápida"]]},
+    {t:"Hidratación y Bebidas",f:[["agua","Agua al día"],["sed","Sensación de sed"],["alcohol","Alcohol"],["cafe","Cafeína"],["otbeb","Otras bebidas"]]},
+    {t:"Actividad Física y Sueño",f:[["ejercicio","Frecuencia ejercicio"],["tipoej","Tipo ejercicio"],["hsueno","Horas sueño"],["calsueno","Calidad sueño (1-5)"],["cenatard","Cena tardía"]]},
+    {t:"Relación Emocional con la Comida",f:[["relcomida","Relación con la comida"],["comemoc","Comer emocional"],["emociones_comer","Emociones que llevan a comer sin hambre"],["control","Pérdida de control"],["nestres","Nivel estrés (1-5)"],["autopercep","Autopercepción (1-5)"],["pensamtos","Pensamientos recurrentes"],["notasemoc","Notas libres"]]},
+    {t:"Historial de Dietas",f:[["dprev","Dietas previas"],["dcuals","Tipos probados"],["dbien","Qué funcionó"],["dmal","Qué no funcionó"],["rebote","Efecto rebote"]]},
+    {t:"Logística y Vida Cotidiana",f:[["quiencoc","Quién cocina"],["tcocina","Tiempo cocina"],["presup","Presupuesto"],["habilidad","Habilidad culinaria (1-5)"],["seguim","Seguimiento preferido"],["notasfin","Notas finales"]]},
+    {t:"Consentimiento y Protección de Datos",f:[["rgpd_cons","Consentimiento"],["rgpd_ver","Veracidad"],["rgpd_com","Comunicaciones (opcional)"]]},
+  ];
+
+  SECS.forEach(s=>{sTit(s.t);let ok=false;s.f.forEach(([k,e])=>{if(d[k]){campo(e,d[k]);ok=true;}});if(!ok){doc.setTextColor(...C.s);doc.setFontSize(8.5);doc.setFont("helvetica","italic");doc.text("Sección no completada.",mL+2,y);y+=9;}});
+
+  const total=doc.getNumberOfPages();
+  for(let i=1;i<=total;i++){doc.setPage(i);if(i===1)continue;doc.setDrawColor(...C.bd);doc.setLineWidth(.25);doc.line(mL,285,W-mR,285);doc.setTextColor(...C.s);doc.setFontSize(6.8);doc.setFont("helvetica","normal");doc.text("Kiko Martínez  ·  Evaluación Nutricional & Bienestar  ·  Documento confidencial",mL,291);doc.text(`${i-1} / ${total-1}`,W-mR,291,{align:"right"});}
+
+  const nom=(d["nombre"]||"cliente").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z\s]/g,"").trim().replace(/\s+/g,"_");
+  doc.save(`evaluacion_nutricional_${nom}.pdf`);
+  toast("PDF generado correctamente");
+  setTimeout(()=>document.getElementById("mBg").classList.add("on"),700);
+}
+
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3200);}
+function limpiar(){if(!confirm("¿Seguro que quieres borrar todas las respuestas?"))return;document.getElementById("form").reset();progreso();toast("Formulario limpiado");}
+</script>
+</body>
+</html>
